@@ -13,6 +13,14 @@ def verify_repo():
 
     return result.returncode == 0
 
+def stage_all_changes():
+    """
+    Stage all changes in the Git repository.
+    """
+    subprocess.run(
+        ["git", "add", "."]
+    )
+
 def has_staged_changes():
     """
     Check if there are any staged changes in the Git repository.
@@ -24,3 +32,18 @@ def has_staged_changes():
     )
 
     return result.returncode == 1
+
+def get_staged_diff():
+    """
+    Returns the text of the staged chages.
+    """
+    result = subprocess.run(
+        ["git", "diff", "--staged"],
+        capture_output=True,
+        text=True
+    )
+
+    if result.returncode != 0:
+        return ""
+
+    return result.stdout
