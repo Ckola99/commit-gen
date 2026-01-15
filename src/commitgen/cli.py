@@ -55,8 +55,23 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
             current_context = typer.prompt("Enter additional context")
             continue # Re-runs the loop with new context
         elif choice.lower() == 'e':
-            # Logic for manual edit would go here
-            break
+            edited_message = typer.edit(message)
+
+            if edited_message is None:
+                typer.echo("Could not open editor. Falling back to inline edit.")
+                message = typer.prompt("Type your message manually")
+
+            if edited_message is not None:
+                message = edited_message.strip()
+                typer.secho("\n--- Updated Message ---", fg=typer.colors.GREEN)
+                typer.echo(message)
+
+                if typer.confirm("Accept this edited message?"):
+                    git_utils.commit_changes(message)
+                    typer.echo("Commit successful!")
+                    break
+            else:
+                typer.echo("No changes made to the message.")
         else:
             typer.echo("Commit cancelled.")
             break
