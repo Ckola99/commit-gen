@@ -63,5 +63,6 @@ def commit_changes(commit_message: str):
     Commit staged changes with the provided commit message.
     """
     subprocess.run(
-        ["git", "commit", "-m", commit_message]
+        ["git", "commit", "-m", commit_message],
+        check=True
     )
