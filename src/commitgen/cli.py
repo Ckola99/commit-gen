@@ -65,6 +65,7 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
                 message = edited_message.strip()
                 typer.secho("\n--- Updated Message ---", fg=typer.colors.GREEN)
                 typer.echo(message)
+                typer.echo("-----------------------\n")
 
                 if typer.confirm("Accept this edited message?"):
                     git_utils.commit_changes(message)
