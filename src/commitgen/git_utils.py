@@ -12,3 +12,15 @@ def verify_repo():
     )
 
     return result.returncode == 0
+
+def has_staged_changes():
+    """
+    Check if there are any staged changes in the Git repository.
+    """
+    result = subprocess.run(
+        ["git", "diff", "--cached", "--quiet"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+
+    return result.returncode == 1

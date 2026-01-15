@@ -19,7 +19,9 @@ def commit():
 
     # STEP 2: Check for staged files
     typer.echo("Checking for staged changes...")
-    # later → git_utils.has_staged_changes()
+    if not git_utils.has_staged_changes():
+        typer.echo("Error: No staged changes found. Please stage your changes before committing.")
+        return
 
     # STEP 3: Extract staged diff
     typer.echo("Extracting staged diff...")
