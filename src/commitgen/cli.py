@@ -1,4 +1,5 @@
 import typer
+import commitgen.git_utils as git_utils
 
 app = typer.Typer(help="CommitGen – AI-powered Conventional Commit generator")
 
@@ -12,7 +13,9 @@ def commit():
 
     # STEP 1: Verify we are inside a Git repository
     typer.echo("Verifying git repository...")
-    # later → git_utils.verify_repo()
+    if not git_utils.verify_repo():
+        typer.echo("Error: You are not inside a Git repository.")
+
 
     # STEP 2: Check for staged files
     typer.echo("Checking for staged changes...")
