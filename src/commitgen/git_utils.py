@@ -47,3 +47,13 @@ def get_staged_diff():
         return ""
 
     return result.stdout
+
+def push_changes():
+    """
+    Push committed changes to the remote repository.
+    """
+    subprocess.run(
+        ["git", "push"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )

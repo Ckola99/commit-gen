@@ -7,6 +7,7 @@ from commitgen.git_utils import (
     has_staged_changes,
     get_staged_diff,
     stage_all_changes,
+    push_changes,
 )
 
 
@@ -92,3 +93,16 @@ class TestStageAllChanges(unittest.TestCase):
         stage_all_changes()
 
         mock_run.assert_called_once_with(["git", "add", "."])
+
+
+class TestPushChanges(unittest.TestCase):
+
+    @patch("subprocess.run")
+    def test_push_changes_calls_git_push(self, mock_run):
+        push_changes()
+
+        mock_run.assert_called_once_with(
+            ["git", "push"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )

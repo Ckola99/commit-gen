@@ -5,7 +5,7 @@ app = typer.Typer(help="CommitGen – AI-powered Conventional Commit generator")
 
 
 @app.command()
-def commit():
+def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commit after committing")):
     """
     Generate a Conventional Commit message from staged changes.
     """
@@ -15,7 +15,7 @@ def commit():
     typer.echo("Verifying git repository...")
     if not git_utils.verify_repo():
         typer.echo("Error: You are not inside a Git repository.")
-        return
+        raise typer.Exit(code=1)
 
 
     # STEP 2: Check for staged files
@@ -30,7 +30,7 @@ def commit():
             typer.echo("All changes have been staged.")
         else:
             typer.echo("Please stage your changes and try again.")
-            return
+            raise typer.Exit(code=1)
 
     # STEP 3: Extract staged diff
     typer.echo("Extracting staged diff...")
@@ -38,14 +38,19 @@ def commit():
 
     if not diff_text.strip():
         typer.echo("Error: Unable to retrieve staged changes.")
-        return
+        raise typer.Exit(code=1)
 
     typer.echo(f"Found {len(diff_text)} characters of changes.")
     # commit_message = generate_commit_message(diff_text)
 
-    # Everything else comes later
-    typer.echo("Workflow scaffold complete.")
+    typer.echo("Commit created.")
 
+    if push:
+        typer.echo("Pushing changes...")
+        git_utils.push_changes()
+        typer.echo("Push complete.")
+
+    typer.echo("Done.")
 
 @app.command()
 def version():
