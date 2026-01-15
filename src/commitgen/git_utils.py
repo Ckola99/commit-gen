@@ -57,3 +57,5 @@ def push_changes():
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
+
+

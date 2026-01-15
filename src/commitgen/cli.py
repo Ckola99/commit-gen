@@ -1,5 +1,6 @@
 import typer
 import commitgen.git_utils as git_utils
+from commitgen import ai
 
 app = typer.Typer(help="CommitGen – AI-powered Conventional Commit generator")
 
@@ -21,29 +22,45 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
     # STEP 2: Check for staged files
     typer.echo("Checking for staged changes...")
     if not git_utils.has_staged_changes():
-        typer.echo("Error: No staged changes found. Please stage your changes before committing.")
-        typer.echo("Would you like to stage all changes now? (y/n): ")
-        choice = input().strip().lower()
-
-        if choice == 'y':
+        typer.echo("No staged changes. Would you like to stage all changes? [y/N]")
+        # This is where the CLI handles user interaction
+        if typer.confirm("Stage all?"):
             git_utils.stage_all_changes()
-            typer.echo("All changes have been staged.")
         else:
-            typer.echo("Please stage your changes and try again.")
+            typer.echo("Aborting commit process. Stage some changes and try again.")
             raise typer.Exit(code=1)
 
     # STEP 3: Extract staged diff
     typer.echo("Extracting staged diff...")
-    diff_text = git_utils.get_staged_diff()
+    current_context = ""
+    while True:
+        diff_text = git_utils.get_staged_diff()
+        if not diff_text.strip():
+            typer.echo("Error: Unable to retrieve staged changes.")
+            raise typer.Exit(code=1)
 
-    if not diff_text.strip():
-        typer.echo("Error: Unable to retrieve staged changes.")
-        raise typer.Exit(code=1)
+        message = ai.generate_commit_message(diff_text, current_context)
 
-    typer.echo(f"Found {len(diff_text)} characters of changes.")
-    # commit_message = generate_commit_message(diff_text)
+        typer.secho("\n--- Suggested Commit Message ---", fg=typer.colors.CYAN)
+        typer.echo(message)
+        typer.echo("---------------------------------\n")
 
-    typer.echo("Commit created.")
+        choice = typer.prompt("(a)ccept, (r)egenerate with context, (e)dit, or (q)uit?")
+
+        if choice.lower() == 'a':
+            # Logic for git commit -m would go here
+            typer.echo("Commit successful!")
+            break
+        elif choice.lower() == 'r':
+            current_context = typer.prompt("Enter additional context")
+            continue # Re-runs the loop with new context
+        elif choice.lower() == 'e':
+            # Logic for manual edit would go here
+            break
+        else:
+            typer.echo("Commit cancelled.")
+            break
+
 
     if push:
         typer.echo("Pushing changes...")

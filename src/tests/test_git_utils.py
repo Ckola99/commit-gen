@@ -8,6 +8,7 @@ from commitgen.git_utils import (
     get_staged_diff,
     stage_all_changes,
     push_changes,
+    generate_commit_message
 )
 
 
@@ -106,3 +107,26 @@ class TestPushChanges(unittest.TestCase):
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
         )
+
+class TestMessageGeneration(unittest.TestCase):
+
+    def test_generate_commit_message_returns_string(self):
+        """Test that the output is always a string."""
+        diff = "diff --git a/file.txt b/file.txt\n+added line"
+        result = generate_commit_message(diff)
+        self.assertIsInstance(result, str)
+
+    def test_generate_commit_message_is_not_empty(self):
+        """Test that the output is not an empty string."""
+        diff = "diff --git a/file.txt b/file.txt\n+added line"
+        result = generate_commit_message(diff)
+        self.assertTrue(len(result) > 0, "The generated message should not be empty.")
+
+    def test_generate_commit_message_handles_empty_diff(self):
+        """Test that the function doesn't crash if passed an empty string."""
+        # This checks for resilience
+        try:
+            result = generate_commit_message("")
+            self.assertIsInstance(result, str)
+        except Exception as e:
+            self.fail(f"generate_commit_message raised {type(e).__name__} unexpectedly!")
