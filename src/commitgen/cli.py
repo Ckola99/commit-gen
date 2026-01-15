@@ -54,10 +54,12 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
 
             if edited_message is None:
                 typer.echo("Could not open editor. Falling back to inline edit.")
-                message = typer.prompt("Type your message manually")
-
-            if edited_message is not None:
+                message = typer.prompt("Type your message manually").strip()
+            else:
                 message = edited_message.strip()
+
+
+            if message:
                 typer.secho("\n--- Updated Message ---", fg=typer.colors.GREEN)
                 typer.echo(message)
                 typer.echo("-----------------------\n")
@@ -67,7 +69,7 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
                     typer.echo("Commit successful!")
                     break
             else:
-                typer.echo("No changes made to the message.")
+                typer.echo("Commit message cannot be empty. Please try again.")
         else:
             typer.echo("Commit cancelled.")
             break
