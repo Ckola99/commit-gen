@@ -30,8 +30,9 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
     current_context = ""
     while True:
         diff_text = git_utils.get_staged_diff()
+
         if not diff_text.strip():
-            typer.echo("Error: Unable to retrieve staged changes.")
+            typer.echo("Error: Unable to retrieve staged changes, or no changes detected.")
             raise typer.Exit(code=1)
 
         message = ai.generate_commit_message(diff_text, current_context)
