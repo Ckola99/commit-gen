@@ -78,8 +78,6 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
         git_utils.push_changes()
         typer.echo("Push complete.")
 
-    typer.echo("Done.")
-
 @app.command()
 def version():
     """
