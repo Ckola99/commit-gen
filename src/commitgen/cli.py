@@ -48,7 +48,7 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
         choice = typer.prompt("(a)ccept, (r)egenerate with context, (e)dit, or (q)uit?")
 
         if choice.lower() == 'a':
-            # Logic for git commit -m would go here
+            git_utils.commit_changes(message)
             typer.echo("Commit successful!")
             break
         elif choice.lower() == 'r':
