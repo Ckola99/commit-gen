@@ -1,6 +1,7 @@
-def generate_commit_message(diff_text: str, context: str = "") -> str:
+def generate_commit_message(diff_text, context):
     """
-    Pure function: Takes text, returns text.
+    Function that generates a commit message based on the provided diff text and context.
+    If no context is provided, it generates a commit message based solely off the diff.
     """
     if not diff_text:
         return "chore: no changes detected"
