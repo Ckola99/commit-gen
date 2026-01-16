@@ -71,9 +71,9 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
                     break
             else:
                 typer.echo("Commit message cannot be empty. Please try again.")
-        else:
-            typer.echo("Commit cancelled.")
-            break
+        elif choice.lower() == 'q':
+            typer.echo("Commit aborted.")
+            raise typer.Exit() # This stops the whole script immediately
 
 
     if push:
