@@ -32,7 +32,7 @@ def _build_prompt(diff_text: str, context: str) -> str:
         "- Use present tense\n"
         "- Do not include explanations\n"
         "- If no changes detected, respond with '[CHORE]: no changes detected'\n"
-        "- adding lines or stylistic changes or whitespace changes is considered a [CHORE]\n"
+        "- Adding lines or stylistic changes or whitespace changes is considered a [CHORE]\n"
         "- If presented additional context use it to generate a more specific message\n"
         "- Cap message at 100 characters per change or feat\n"
     )
