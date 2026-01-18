@@ -33,12 +33,12 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
     """
     Generate a Conventional Commit message from staged changes.
     """
-    # STEP 1: Verify we are inside a Git repository
+
     if not git_utils.verify_repo():
         console.print(Panel("[bold red]You are not inside a Git repository[/bold red]", title="Error", border_style="red"))
         raise typer.Exit(code=1)
 
-    # STEP 2: Check for staged files
+
     if not git_utils.has_staged_changes():
         console.print(Panel("[yellow]No staged changes detected.[/yellow]", title="Info", border_style="yellow"))
         if typer.confirm("Stage all?"):
@@ -47,7 +47,7 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
             console.print(Panel("[red]Aborting commit process. Stage some changes and try again.[/red]", title="Error", border_style="red"))
             raise typer.Exit(code=1)
 
-    # STEP 3: Extract staged diff
+
     current_context = ""
     while True:
         diff_text = git_utils.get_staged_diff()
@@ -106,9 +106,8 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
 
         elif choice.lower() == 'q':
             console.print(Panel("[yellow]Commit aborted by user[/yellow]", title="Aborted", border_style="yellow"))
-            raise typer.Exit()
+            raise typer.Exit(code=1)
 
-    # STEP 4: Optional push
     if push:
         console.print(Panel("[cyan]Pushing changes...[/cyan]", title="Info", border_style="cyan"))
         git_utils.push_changes()

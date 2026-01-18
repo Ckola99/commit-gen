@@ -1,16 +1,36 @@
 import unittest
-from commitgen.ai import generate_commit_message
+from unittest.mock import patch, MagicMock
+from commitgen import ai
 
-class TestMessageGeneration(unittest.TestCase):
 
-    def test_returns_string(self):
-        result = generate_commit_message("some diff")
-        self.assertIsInstance(result, str)
+class TestAI(unittest.TestCase):
 
-    def test_handles_empty_diff(self):
-        result = generate_commit_message("")
-        self.assertEqual(result, "chore: no changes detected")
+    def test_build_prompt_without_context(self):
+        diff = "diff --git a/file b/file"
+        prompt = ai._build_prompt(diff, "")
+        self.assertIn("GIT DIFF:", prompt)
+        self.assertIn(diff, prompt)
+        self.assertNotIn("ADDITIONAL CONTEXT", prompt)
 
-    def test_includes_context(self):
-        result = generate_commit_message("diff", "my context")
-        self.assertIn("my context", result)
+    def test_build_prompt_with_context(self):
+        diff = "diff"
+        context = "Fix crash"
+        prompt = ai._build_prompt(diff, context)
+        self.assertIn("ADDITIONAL CONTEXT", prompt)
+        self.assertIn(context, prompt)
+
+    @patch("commitgen.ai.ensure_api_key", return_value="fake-key")
+    @patch("commitgen.ai.OpenAI")
+    def test_generate_commit_message(self, mock_openai, _):
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.output_text = "[FEAT]: add login"
+        mock_client.responses.create.return_value = mock_response
+        mock_openai.return_value = mock_client
+
+        msg = ai.generate_commit_message("diff", "")
+        self.assertEqual(msg, "[FEAT]: add login")
+
+    def test_generate_commit_message_empty_diff(self):
+        msg = ai.generate_commit_message("", "")
+        self.assertEqual(msg, "chore: no changes detected")
