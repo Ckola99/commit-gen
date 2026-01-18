@@ -119,6 +119,10 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
             message = edited
 
         elif choice.lower() == 'e':
+            console.print(
+                "[dim]Tip: Save the file before closing the editor to apply changes.[/dim]"
+            )
+            
             edited_message = typer.edit(message)
 
             # User closed editor without saving
