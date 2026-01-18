@@ -35,18 +35,21 @@ def has_staged_changes():
 
 def get_staged_diff():
     """
-    Returns the text of the staged chages.
+    Returns the text of the staged changes.
     """
     result = subprocess.run(
         ["git", "diff", "--staged"],
-        capture_output=True,
-        text=True
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        encoding="utf-8",
+        errors="replace",  # <- prevents crashes
     )
 
     if result.returncode != 0:
         return ""
 
-    return result.stdout
+    return result.stdout or ""
 
 def push_changes():
     """

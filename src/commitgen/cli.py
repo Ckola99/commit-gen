@@ -32,7 +32,7 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
     while True:
         diff_text = git_utils.get_staged_diff()
 
-        if not diff_text.strip():
+        if not diff_text or not diff_text.strip():
             typer.echo("Error: Unable to retrieve staged changes, or no changes detected.")
             raise typer.Exit(code=1)
 
