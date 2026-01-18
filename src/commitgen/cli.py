@@ -66,10 +66,21 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
                 "Select files (comma-separated numbers)"
             )
 
-            indexes = [int(i.strip()) for i in selection.split(",")]
+            try:
+                indexes = [int(i.strip()) for i in selection.split(",")]
+                for i in indexes:
+                    git_utils.stage_file(files[i - 1])
 
-            for i in indexes:
-                git_utils.stage_file(files[i - 1])
+                console.print(
+                    Panel(
+                        "[green]Selected files staged successfully[/green]",
+                        title="Success",
+                        border_style="green",
+                    )
+                )
+            except ValueError:
+                console.print("[red]Invalid selection[/red]")
+            raise typer.Exit(code=1)
 
         else:
             raise typer.Exit(code=1)
@@ -85,8 +96,8 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
                         title="Error",
                         border_style="red",
                     )
-            )
-            raise typer.Exit(code=1)
+                )
+                raise typer.Exit(code=1)
 
         if message is None:
             message = ai.generate_commit_message(diff_text, current_context)
@@ -107,7 +118,7 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
         if len(changes) > 1:
             display_change_summary(changes)
 
-        choice = typer.prompt("(a)ccept, (r)egenerate with context, (i)nline edit, (e)dit in custom editor, or (q)uit?")
+        choice = typer.prompt("(a)ccept, (r)egenerate with context, (i)nline edit, (e)xtended inline edit in custom editor, or (q)uit?")
 
         if choice.lower() == 'a':
             git_utils.commit_changes(message)
@@ -138,6 +149,7 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
                     )
                 )
                 continue
+            message = edited
 
         elif choice.lower() == 'e':
             edited_message = typer.prompt(
