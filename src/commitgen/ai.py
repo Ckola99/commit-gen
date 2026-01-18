@@ -37,7 +37,7 @@ def _build_prompt(diff_text: str, context: str) -> str:
         "- for each change type, use appropriate prefix ([FEAT], [FIX], [DOCS], [STYLE], [REFACTOR], [PERF], [TEST], [CI], [CHORE])\n"
         "- Be concise\n"
         "- If multiple change types are present, include both in the message\n"
-        "- example if more than one change type detected '[FEAT]: add user login feature',\n '[FIX]: resolve crash on startup',\n '[DOCS]: update README with setup instructions'\n"
+        "- Example IDEAL output use this template if more than one change type detected '[FEAT]: add user login feature',\n '[FIX]: resolve crash on startup',\n '[DOCS]: update README with setup instructions'\n"
         "- Use present tense\n"
         "- Do not include explanations\n"
         "- If no changes detected, respond with '[CHORE]: no changes detected'\n"
