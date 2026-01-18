@@ -102,15 +102,6 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
         if message is None:
             message = ai.generate_commit_message(diff_text, current_context)
 
-        # Optional: extract multiple change types from AI message
-        # Simple heuristic: lines starting with '[TYPE]'
-        changes = []
-        for line in message.splitlines():
-            if line.startswith('[') and ']' in line:
-                type_part = line[1:line.index(']')]
-                desc_part = line[line.index(']') + 2:]  # skip "] "
-                changes.append((type_part, desc_part))
-
         # --- Suggested Commit Message ---
         console.print(Panel(message, title="💡 Suggested Commit Message", border_style="cyan"))
 
@@ -177,6 +168,14 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
         console.print(Panel("[cyan]Pushing changes...[/cyan]", title="Info", border_style="cyan"))
         git_utils.push_changes()
         console.print(Panel("[green]✅ Push complete![/green]", title="Success", border_style="green"))
+    else:
+        push_choice = typer.prompt("Do you want to push the commit now? (y/n)").lower()
+        if push_choice == 'y':
+            console.print(Panel("[cyan]Pushing changes...[/cyan]", title="Info", border_style="cyan"))
+            git_utils.push_changes()
+            console.print(Panel("[green]✅ Push complete![/green]", title="Success", border_style="green"))
+        else:
+            console.print(Panel("[yellow]Remember to push your commit later![/yellow]", title="Reminder", border_style="yellow"))
 
 
 @app.command()
