@@ -17,7 +17,7 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
     """
 
     current_context = ""
-    message = None           # cached AI output
+    message = None
     diff_text = None
 
     if not git_utils.verify_repo():
@@ -123,7 +123,7 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
                 "[dim]Tip: Save the file before closing the editor to apply changes. Press Ctrl+S to save![/dim]"
             )
 
-            edited_message = typer.edit(message)
+            edited_message = typer.edit(editor_template(message))
 
             # User closed editor without saving
             if edited_message is None:
@@ -136,7 +136,9 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
                 )
                 continue
 
-            edited_message = edited_message.strip()
+            edited_message = "\n".join(
+                line for line in edited_message.splitlines() if not line.strip().startswith("#")
+            ).strip()
 
             if not edited_message:
                 console.print(
@@ -193,3 +195,17 @@ def config():
     CONFIG_FILE.write_text(f"OPENAI_API_KEY={api_key}\n")
 
     console.print(Panel("[green]API key saved successfully![/green]", title="Success", border_style="green"))
+
+def editor_template(message: str) -> str:
+    return (
+        "# CommitGen – Extended Commit Message Editor\n"
+        "#\n"
+        "# Save the file before closing to apply changes.\n"
+        "# VS Code: Ctrl+S (Windows/Linux) or Cmd+S (macOS)\n"
+        "# Vim: :wq\n"
+        "# Nano: Ctrl+O, Enter, then Ctrl+X\n"
+        "#\n"
+        "# Lines starting with '#' will be ignored.\n"
+        "#\n\n"
+        f"{message}\n"
+    )
