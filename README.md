@@ -21,7 +21,7 @@ git commit -m "pls work"
 ## Installation
 
 ```bash
-pip install commitgen-cli
+pip install commitgen-tool
 ```
 
 **Requirements:**
@@ -627,7 +627,7 @@ See [LICENSE](LICENSE) for full details.
 
 ## Links
 
-- **PyPI**: [commitgen-cli](https://pypi.org/project/commitgen-cli/)
+- **PyPI**: [commitgen-cli](https://pypi.org/project/commitgen-tool/)
 - **GitHub**: [github.com/<your-username>/commitgen](https://github.com/<your-username>/commitgen)
 - **Documentation**: [Coming soon]
 - **Changelog**: [CHANGELOG.md](CHANGELOG.md)
