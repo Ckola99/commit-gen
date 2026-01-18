@@ -77,7 +77,7 @@ def _fallback_commit_message(diff_text: str, context: str) -> str:
     if not diff_text.strip():
         return "chore: no changes detected"
 
-    base = "feat: update codebase"
+    base = "[FEAT]: update to codebase"
 
     if context:
         return f"{base}\n\nContext: {context}"
