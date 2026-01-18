@@ -1,6 +1,7 @@
 import typer
 import commitgen.git_utils as git_utils
 from commitgen import ai
+from commitgen.config import CONFIG_DIR, CONFIG_FILE
 
 app = typer.Typer(help="CommitGen – AI-powered Conventional Commit generator")
 
@@ -81,9 +82,24 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
         git_utils.push_changes()
         typer.echo("Push complete.")
 
+
 @app.command()
 def version():
     """
     Show CommitGen version.
     """
     typer.echo("CommitGen version: 0.1.0")
+
+
+@app.command()
+def config():
+    """
+    Configure commitgen settings (API keys, preferences, etc.)
+    """
+
+    api_key = typer.prompt("Enter your OpenAI API Key", hide_input=True)
+
+    CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+    CONFIG_FILE.write_text(f"OPENAI_API_KEY={api_key}\n")
+
+    typer.echo(f"API key saved successfully.")
