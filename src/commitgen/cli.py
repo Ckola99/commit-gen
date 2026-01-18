@@ -120,7 +120,7 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
 
         elif choice.lower() == 'e':
             console.print(
-                "[dim]Tip: Save the file before closing the editor to apply changes.[/dim]"
+                "[dim]Tip: Save the file before closing the editor to apply changes. Press Ctrl+S to save![/dim]"
             )
 
             edited_message = typer.edit(message)
