@@ -206,6 +206,7 @@ def config():
 
     console.print(Panel("[green]API key saved successfully![/green]", title="Success", border_style="green"))
 
+
 def editor_template(message: str) -> str:
     return (
         "# CommitGen – Extended Commit Message Editor\n"
