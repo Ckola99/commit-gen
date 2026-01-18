@@ -16,8 +16,6 @@ def generate_commit_message(diff_text, context):
     api_key = ensure_api_key()
     client = OpenAI(api_key=api_key)
 
-    
-
     response = client.responses.create( model="gpt-5-nano", input=prompt, store=True, )
 
     return response.output_text
