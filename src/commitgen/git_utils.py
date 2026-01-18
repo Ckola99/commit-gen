@@ -69,3 +69,28 @@ def commit_changes(commit_message: str):
         ["git", "commit", "-m", commit_message],
         check=True
     )
+
+def get_modified_files():
+    """
+    Get a list of modified files in the Git repository.
+    """
+
+    result = subprocess.run(
+        ["git", "status", "--porcelain"],
+        stdout=subprocess.PIPE,
+        text=True,
+    )
+
+    files = []
+    for line in result.stdout.splitlines():
+        files.append(line[3:])
+
+    return files
+
+
+def stage_file(path: str):
+    """
+    Stage a specific file in the Git repository.
+    """
+    
+    subprocess.run(["git", "add", path])

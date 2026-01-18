@@ -49,6 +49,30 @@ def _build_prompt(diff_text: str, context: str) -> str:
 
     return prompt
 
+def refine_commit_message(existing_message: str, context: str) -> str:
+    api_key = ensure_api_key()
+    client = OpenAI(api_key=api_key)
+
+    prompt = (
+        "You are refining an existing Conventional Commit message.\n\n"
+        f"EXISTING MESSAGE:\n{existing_message}\n\n"
+        f"USER CONTEXT:\n{context}\n\n"
+        "Rules:\n"
+        "- Do NOT re-analyze git diff\n"
+        "- Preserve existing structure\n"
+        "- Only refine wording or add clarity\n"
+        "- Use Conventional Commit prefixes\n"
+        "- Keep output concise\n"
+    )
+
+    response = client.responses.create(
+        model="gpt-5-nano",
+        input=prompt,
+        store=True,
+    )
+
+    return response.output_text
+
 def _fallback_commit_message(diff_text: str, context: str) -> str:
     if not diff_text.strip():
         return "chore: no changes detected"

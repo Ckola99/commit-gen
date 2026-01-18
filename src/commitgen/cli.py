@@ -34,6 +34,10 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
     Generate a Conventional Commit message from staged changes.
     """
 
+    current_context = ""
+    message = None           # cached AI output
+    diff_text = None
+
     if not git_utils.verify_repo():
         console.print(Panel("[bold red]You are not inside a Git repository[/bold red]", title="Error", border_style="red"))
         raise typer.Exit(code=1)
@@ -41,23 +45,51 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
 
     if not git_utils.has_staged_changes():
         console.print(Panel("[yellow]No staged changes detected.[/yellow]", title="Info", border_style="yellow"))
-        if typer.confirm("Stage all?"):
+
+        choice = typer.prompt(
+            "(a) stage all, (s) select files, (q) quit"
+        ).lower()
+
+        if choice == 'a':
             git_utils.stage_all_changes()
+        elif choice == 's':
+            files = git_utils.get_modified_files()
+
+            if not files:
+                console.print("[red]No files to stage[/red]")
+                raise typer.Exit(code=1)
+
+            for i, f in enumerate(files, 1):
+                console.print(f"[{i}] {f}")
+
+            selection = typer.prompt(
+                "Select files (comma-separated numbers)"
+            )
+
+            indexes = [int(i.strip()) for i in selection.split(",")]
+
+            for i in indexes:
+                git_utils.stage_file(files[i - 1])
+
         else:
-            console.print(Panel("[red]Aborting commit process. Stage some changes and try again.[/red]", title="Error", border_style="red"))
             raise typer.Exit(code=1)
 
-
-    current_context = ""
     while True:
-        diff_text = git_utils.get_staged_diff()
+        if diff_text is None:
+            diff_text = git_utils.get_staged_diff()
 
-        if not diff_text or not diff_text.strip():
-            console.print(Panel("[bold red]Unable to retrieve staged changes, or no changes detected[/bold red]", title="Error", border_style="red"))
+            if not diff_text.strip():
+                console.print(
+                    Panel(
+                        "[bold red]Unable to retrieve staged changes[/bold red]",
+                        title="Error",
+                        border_style="red",
+                    )
+            )
             raise typer.Exit(code=1)
 
-        # Generate commit message
-        message = ai.generate_commit_message(diff_text, current_context)
+        if message is None:
+            message = ai.generate_commit_message(diff_text, current_context)
 
         # Optional: extract multiple change types from AI message
         # Simple heuristic: lines starting with '[TYPE]'
@@ -75,7 +107,7 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
         if len(changes) > 1:
             display_change_summary(changes)
 
-        choice = typer.prompt("(a)ccept, (r)egenerate with context, (e)dit, or (q)uit?")
+        choice = typer.prompt("(a)ccept, (r)egenerate with context, (i)nline edit, (e)dit in custom editor, or (q)uit?")
 
         if choice.lower() == 'a':
             git_utils.commit_changes(message)
@@ -83,17 +115,38 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
             break
 
         elif choice.lower() == 'r':
-            current_context = typer.prompt("Enter additional context")
-            continue
+            extra_context = typer.prompt("Add context to refine this message").strip()
+
+            if not extra_context:
+                continue
+
+            message = ai.refine_commit_message(diff_text, message, extra_context)
+
+        elif choice.lower() == 'i':
+            edited = typer.prompt(
+                "Edited commit message",
+                default=message,
+                show_default=True
+            ).strip()
+
+            if not edited:
+                console.print(
+                    Panel(
+                        "[red]Commit message cannot be empty.[/red]",
+                        title="Error",
+                        border_style="red",
+                    )
+                )
+                continue
 
         elif choice.lower() == 'e':
-            edited_message = typer.edit(message)
+            edited_message = typer.prompt(
+                "Edit commit message",
+                default=message,
+                show_default=True,
+            )
 
-            if edited_message is None:
-                console.print("[yellow]Could not open editor. Falling back to inline edit.[/yellow]")
-                message = typer.prompt("Type your message manually").strip()
-            else:
-                message = edited_message.strip()
+            message = edited_message.strip()
 
             if message:
                 console.print(Panel(message, title="✏️ Edited Message", border_style="green"))
