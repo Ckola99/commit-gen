@@ -37,7 +37,6 @@ def _build_prompt(diff_text: str, context: str) -> str:
         "- for each change type, use appropriate prefix ([FEAT], [FIX], [DOCS], [STYLE], [REFACTOR], [PERF], [TEST], [CI], [CHORE])\n"
         "- Be concise\n"
         "- If multiple change types are present, include both in the message\n"
-        "- Example IDEAL output use this template if more than one change type detected '[FEAT]: add user login feature',\n '[FIX]: resolve crash on startup',\n '[DOCS]: update README with setup instructions'\n"
         "- Use present tense\n"
         "- Do not include explanations\n"
         "- If no changes detected, respond with '[CHORE]: no changes detected'\n"
@@ -45,6 +44,7 @@ def _build_prompt(diff_text: str, context: str) -> str:
         "- If presented additional context use it to generate a more specific message\n"
         "- Cap message at 100 characters per change or feat\n"
         "- Use imperative present tense (e.g. \"add\", \"fix\", \"update\", not \"added\" or \"fixed\")\n"
+        "- MOST IMPORTANT DO NOT SKIP THIS STEP Make sure to output using this template if more than one change type detected example -> '[FEAT]: add user login feature',\n '[FIX]: resolve crash on startup',\n '[DOCS]: update README with setup instructions'\n"
     )
 
     return prompt

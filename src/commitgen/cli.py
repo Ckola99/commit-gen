@@ -119,20 +119,41 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
             message = edited
 
         elif choice.lower() == 'e':
-            edited_message = typer.edit(
-                "Edit commit message",
-            )
+            edited_message = typer.edit(message)
 
-            message = edited_message.strip()
+            # User closed editor without saving
+            if edited_message is None:
+                console.print(
+                    Panel(
+                        "[yellow]Editor closed without saving. Keeping previous message.[/yellow]",
+                        title="Info",
+                        border_style="yellow",
+                    )
+                )
+                continue
 
-            if message:
-                console.print(Panel(message, title="✏️ Edited Message", border_style="green"))
-                if typer.confirm("Accept this edited message?"):
-                    git_utils.commit_changes(message)
-                    console.print(Panel("[green]✅ Commit successful![/green]", title="Success", border_style="green"))
-                    break
-            else:
-                console.print(Panel("[red]Commit message cannot be empty. Please try again[/red]", title="Error", border_style="red"))
+            edited_message = edited_message.strip()
+
+            if not edited_message:
+                console.print(
+                Panel(
+                        "[red]Commit message cannot be empty.[/red]",
+                        title="Error",
+                        border_style="red",
+                    )
+                )
+                continue
+
+            message = edited_message
+
+            console.print(Panel(message, title="✏️ Edited Message", border_style="green"))
+
+            if typer.confirm("Accept this edited message?"):
+                git_utils.commit_changes(message)
+                console.print(
+                    Panel("[green]✅ Commit successful![/green]", title="Success", border_style="green")
+                )
+                break
 
         elif choice.lower() == 'q':
             console.print(Panel("[yellow]Commit aborted by user[/yellow]", title="Aborted", border_style="yellow"))
