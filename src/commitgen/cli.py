@@ -10,24 +10,6 @@ app = typer.Typer(help="CommitGen – AI-powered Conventional Commit generator")
 console = Console()
 
 
-def display_change_summary(changes: list[tuple[str, str]]):
-    """
-    Display a table summarizing multiple changes (FEAT/FIX/DOCS/CHORE/TEST/etc.).
-    Each row is a tuple: (change_type, description)
-    """
-    if not changes:
-        return
-
-    table = Table(title="📝 Summary of Changes", show_lines=True)
-    table.add_column("Type", style="bold cyan")
-    table.add_column("Description", style="white")
-
-    for change_type, description in changes:
-        table.add_row(change_type, description)
-
-    console.print(table)
-
-
 @app.command()
 def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commit after committing")):
     """
@@ -105,10 +87,6 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
         # --- Suggested Commit Message ---
         console.print(Panel(message, title="💡 Suggested Commit Message", border_style="cyan"))
 
-        # --- Show table if multiple changes ---
-        if len(changes) > 1:
-            display_change_summary(changes)
-
         choice = typer.prompt("(a)ccept, (r)egenerate with context, (i)nline edit, (e)xtended inline edit in custom editor, or (q)uit?")
 
         if choice.lower() == 'a':
@@ -127,8 +105,6 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
         elif choice.lower() == 'i':
             edited = typer.prompt(
                 "Edited commit message",
-                default=message,
-                show_default=True
             ).strip()
 
             if not edited:
@@ -143,10 +119,8 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
             message = edited
 
         elif choice.lower() == 'e':
-            edited_message = typer.prompt(
+            edited_message = typer.edit(
                 "Edit commit message",
-                default=message,
-                show_default=True,
             )
 
             message = edited_message.strip()
