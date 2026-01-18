@@ -80,7 +80,7 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
                 )
             except ValueError:
                 console.print("[red]Invalid selection[/red]")
-            raise typer.Exit(code=1)
+                raise typer.Exit(code=1)
 
         else:
             raise typer.Exit(code=1)
