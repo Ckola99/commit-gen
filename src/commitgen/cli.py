@@ -84,6 +84,16 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
         if message is None:
             message = ai.generate_commit_message(diff_text, current_context)
 
+            if not message.strip() or message:
+                console.print(
+                    Panel(
+                        "[bold red]Failed to generate commit message. using fallback[/bold red]",
+                        title="Error",
+                        border_style="red",
+                    )
+                )
+                message = ai._fallback_commit_message(diff_text, current_context)
+        
         # --- Suggested Commit Message ---
         console.print(Panel(message, title="💡 Suggested Commit Message", border_style="cyan"))
 
