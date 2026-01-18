@@ -619,7 +619,7 @@ Built with:
 
 ## License
 
-MIT License © [Your Name]
+MIT License © [Christopher Kola]
 
 See [LICENSE](LICENSE) for full details.
 
