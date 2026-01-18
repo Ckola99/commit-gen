@@ -122,7 +122,7 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
             console.print(
                 "[dim]Tip: Save the file before closing the editor to apply changes.[/dim]"
             )
-            
+
             edited_message = typer.edit(message)
 
             # User closed editor without saving
@@ -158,6 +158,7 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
                     Panel("[green]✅ Commit successful![/green]", title="Success", border_style="green")
                 )
                 break
+
 
         elif choice.lower() == 'q':
             console.print(Panel("[yellow]Commit aborted by user[/yellow]", title="Aborted", border_style="yellow"))
