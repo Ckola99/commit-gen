@@ -1,0 +1,2 @@
+# CommitGen user config (never commit secrets)
+.config/commitgen/
