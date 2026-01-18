@@ -1,96 +1,44 @@
 # CommitGen
 
-**AI-powered Conventional Commit message generator CLI**
+**AI-powered Conventional Commit message generator for Git**
 
-CommitGen is a command-line tool that generates clean, structured commit messages using AI. It helps you write commits that follow the [Conventional Commits](https://www.conventionalcommits.org/) standard (`FEAT`, `FIX`, `CHORE`, `DOCS`, etc.) directly from your terminal, without needing to think about formatting or context.
+Stop writing bad commit messages. CommitGen uses AI to analyze your staged changes and generates clean, structured commits that follow the [Conventional Commits](https://www.conventionalcommits.org/) standard.
 
----
+```bash
+# Before CommitGen
+git commit -m "fix stuff"
+git commit -m "final fix"
+git commit -m "pls work"
 
-## Why CommitGen?
-
-We've all written bad commit messages at some point:
-
+# With CommitGen
+[FIX]: resolve null pointer in authentication handler
+[FEAT]: add user session management with Redis
+[DOCS]: update API documentation with examples
 ```
-fix stuff
-final fix
-pls work
-```
-
-Bad commits slow down code reviews, debugging, and collaboration. CommitGen solves this by:
-
-- ✅ Automatically analyzing your staged changes
-- ✅ Categorizing them as `FEAT`, `FIX`, `CHORE`, `DOCS`, etc.
-- ✅ Generating structured, readable commit messages
-- ✅ Summarizing multiple changes in a single commit
-
----
-
-## Before vs After
-
-### Before (manual / Copilot):
-
-```
-fix stuff
-final fix
-pls work
-```
-
-### After CommitGen:
-
-```
-[FIX]: guard against None staged diff in CLI
-[FIX]: improve get_staged_diff: use pipes, utf-8 encoding, and replace errors
-[DOCS]: fix typo in get_staged_diff docstring
-```
-
-### Multiple changes example:
-
-```
-[FEAT]: add diff parsing utility
-[FIX]: handle edge case in CLI for empty staged diff
-[DOCS]: update README with usage instructions
-```
-
----
-
-## Features
-
-- 🤖 Generate Conventional Commit messages from staged changes
-- 📋 Categorizes changes into `FEAT`, `FIX`, `CHORE`, `DOCS`, and more
-- 📦 Supports multiple staged changes and summarizes them automatically
-- ✏️ Multiple editing modes: accept, regenerate, inline edit, or extended editor
-- 💻 Works entirely from the terminal (no IDE required)
-- 🔐 Configurable API key storage for OpenAI
-- 🚀 Optional automatic push after commit
 
 ---
 
 ## Installation
 
 ```bash
-# Clone the repository
-git clone https://github.com/<your-username>/commitgen.git
-cd commitgen
-
-# Install in editable mode for development
-pip install -e .
+pip install commitgen-cli
 ```
 
-After installation, the `commitgen` command will be available globally.
-
-### Requirements
-
+**Requirements:**
 - Python 3.10+
 - Git installed and configured
-- OpenAI API key
+- **OpenAI API key with available tokens** (currently required)
+
+> ⚠️ **Important**: This version requires an OpenAI API key and uses paid API calls. Support for free local LLMs is planned for future releases.
 
 ---
 
 ## Quick Start
 
 ```bash
-# 1. Configure your OpenAI API key (first time only)
+# 1. Set up your OpenAI API key (one-time setup)
 commitgen config
+# Enter your API key when prompted
 
 # 2. Stage your changes
 git add .
@@ -99,263 +47,124 @@ git add .
 commitgen commit
 ```
 
+That's it! CommitGen will analyze your diff and suggest a commit message.
+
 ---
 
-## Usage
+## Getting an OpenAI API Key
 
-### Basic Commands
+1. Go to [OpenAI Platform](https://platform.openai.com/)
+2. Sign up or log in
+3. Navigate to API Keys section
+4. Create a new API key
+5. Add credits to your account (pay-as-you-go)
+
+**Cost**: Approximately $0.001-0.01 per commit message (very affordable!)
+
+You can set usage limits in your OpenAI dashboard to control costs.
+
+---
+
+## Basic Usage
+
+### Generate a Commit
 
 ```bash
-# Generate a commit message from staged changes
 commitgen commit
+```
 
-# Generate and push immediately
+You'll see a suggested message:
+
+```
+💡 Suggested Commit Message
+┌──────────────────────────────────────────┐
+│ [FEAT]: add user authentication endpoint │
+└──────────────────────────────────────────┘
+
+(a)ccept, (r)egenerate with context, (i)nline edit, (e)xtended editor, or (q)uit?
+```
+
+### Options When Reviewing
+
+- `a` - Accept and commit immediately
+- `r` - Add context to refine the message
+- `i` - Edit the message in your terminal
+- `e` - Open your preferred text editor
+- `q` - Quit without committing
+
+### Commit and Push
+
+```bash
+# Commit and push in one command
 commitgen commit --push
 
-# Configure your OpenAI API key
+# Or use the short flag
+commitgen commit -p
+```
+
+### Other Commands
+
+```bash
+# Configure API key
 commitgen config
 
 # Show version
 commitgen version
 
-# See help
+# Get help
 commitgen --help
 ```
-
-### Interactive Workflow
-
-When you run `commitgen commit`, you'll be presented with a suggested commit message and options:
-
-```
-💡 Suggested Commit Message
-┌──────────────────────────────────────────────┐
-│ [FEAT]: add user authentication endpoint     │
-│ [FIX]: resolve null pointer in login handler│
-└──────────────────────────────────────────────┘
-
-(a)ccept, (r)egenerate with context, (i)nline edit, (e)xtended inline edit in custom editor, or (q)uit?
-```
-
-**Options:**
-- `(a)` - Accept the message and commit
-- `(r)` - Provide additional context to refine the message
-- `(i)` - Edit the message directly in the terminal
-- `(e)` - Open your preferred text editor for detailed editing
-- `(q)` - Quit without committing
-
-### Handling Unstaged Changes
-
-If you haven't staged changes yet, CommitGen will prompt you:
-
-```
-No staged changes detected.
-(a) stage all, (s) select files, (q) quit
-```
-
-- `(a)` - Stage all modified files (`git add .`)
-- `(s)` - Select specific files to stage
-- `(q)` - Exit
-
----
-
-## ✏️ Editing Commit Messages (Editor Instructions)
-
-When using CommitGen, you can edit the generated commit message in multiple ways:
-
-1. **Inline edit** – edit directly in the terminal
-2. **Extended editor mode** – open your preferred text editor (recommended for longer messages)
-
-When prompted, choose:
-
-```
-(e) extended inline edit in custom editor
-```
-
-CommitGen will open your default system editor with instructions at the top of the file.
-
-### ⚠️ Important:
-
-**You must save the file before closing the editor**, otherwise your changes will be discarded.
-
-This behavior is identical to how `git commit` works.
-
-### What you'll see in the editor
-
-At the top of the file, CommitGen inserts instructions like:
-
-```
-# CommitGen – Extended Commit Message Editor
-#
-# Save the file before closing to apply changes.
-# VS Code: Ctrl+S (Windows/Linux) or Cmd+S (macOS)
-# Vim: :wq
-# Nano: Ctrl+O, Enter, then Ctrl+X
-#
-# Lines starting with '#' will be ignored.
-#
-
-[FEAT]: add diff parsing utility
-```
-
-- Lines starting with `#` are ignored
-- Only the actual commit message is used
-- Closing without saving keeps the previous message
-
----
-
-## Setting Your Preferred Editor
-
-CommitGen uses the same editor resolution order as Git:
-
-1. `$GIT_EDITOR`
-2. `$VISUAL`
-3. `$EDITOR`
-
-You only need to set one of these.
-
-### ✅ Windows (PowerShell)
-
-**Set VS Code as editor (recommended):**
-
-```powershell
-setx GIT_EDITOR "code --wait"
-```
-
-Restart your terminal after running this.
-
-**Explanation:**
-- `--wait` ensures CommitGen waits until you close the editor
-- Without it, the commit will continue immediately
-
-### ✅ Windows (Git Bash)
-
-```bash
-export GIT_EDITOR="code --wait"
-```
-
-To make it permanent, add it to `~/.bashrc` or `~/.bash_profile`:
-
-```bash
-echo 'export GIT_EDITOR="code --wait"' >> ~/.bashrc
-```
-
-### ✅ Linux / macOS (Bash or Zsh)
-
-**VS Code:**
-```bash
-export GIT_EDITOR="code --wait"
-```
-
-**Vim (default on many systems):**
-```bash
-export GIT_EDITOR=vim
-```
-
-**Nano (beginner-friendly):**
-```bash
-export GIT_EDITOR=nano
-```
-
-To persist the setting, add it to:
-- `~/.bashrc` (Bash)
-- `~/.zshrc` (Zsh)
-
-Example:
-```bash
-echo 'export GIT_EDITOR="code --wait"' >> ~/.zshrc
-```
-
-### Editor Shortcuts (Quick Reference)
-
-| Editor | Save & Close |
-|--------|--------------|
-| VS Code | `Ctrl+S` → close tab |
-| Vim | `:wq` + Enter |
-| Nano | `Ctrl+O` → Enter → `Ctrl+X` |
-| Sublime | `Ctrl+S` → close tab |
-
-### Common Pitfall (and how CommitGen handles it)
-
-If you:
-1. Open the editor
-2. Close it without saving
-
-CommitGen will safely detect this and show:
-
-```
-Editor closed without saving. Keeping previous message.
-```
-
-**No crash, no bad commit.**
-
-### Why CommitGen Works This Way
-
-This behavior is intentional and mirrors Git:
-- ✅ Prevents accidental commits
-- ✅ Gives you full control over the final message
-- ✅ Works with any editor
-- ✅ Keeps CommitGen editor-agnostic and reliable
-
----
-
-## Configuration
-
-CommitGen stores your API key in a user-specific config file:
-
-- **Linux/macOS**: `~/.config/commitgen/config.env`
-- **Windows**: `%USERPROFILE%\.config\commitgen\config.env`
-
-You can set your API key with:
-
-```bash
-commitgen config
-```
-
-When prompted, enter your OpenAI API key. The key is stored locally and never transmitted except to OpenAI's API.
-
-⚠️ **Never commit your API key to Git.** CommitGen handles this securely by storing it in your user config directory.
 
 ---
 
 ## How It Works
 
-### 1. **Analyze Changes**
-CommitGen reads your staged git diff using `git diff --staged`
+1. **Analyzes Your Changes**: Reads `git diff --staged` to see what you've modified
+2. **AI Processing**: Sends the diff to OpenAI's GPT-5-nano model with instructions to generate a Conventional Commit
+3. **Interactive Review**: Lets you accept, edit, or regenerate the message
+4. **Safe Commit**: Only commits after you approve the message
 
-### 2. **AI Processing**
-The diff is sent to OpenAI's API with a carefully crafted prompt that:
-- Analyzes the changes
-- Categorizes them by type (FEAT, FIX, DOCS, etc.)
-- Generates concise, present-tense commit messages
-- Follows Conventional Commits standards
+> **Current Model**: CommitGen uses GPT-5-nano for fast, cost-effective commit generation. Model selection will be configurable in future releases.
 
-### 3. **Interactive Review**
-You can:
-- Accept the message as-is
-- Regenerate with additional context
-- Edit inline or in your preferred editor
-- Abort if needed
+### What Gets Sent to OpenAI?
 
-### 4. **Commit & Push**
-Once approved, CommitGen executes `git commit -m "message"` and optionally pushes to remote.
+Only your git diff is sent - not your entire codebase. The diff shows:
+- Which files changed
+- What lines were added/removed
+- Function and variable names in the changes
+
+**Privacy Note**: If you're working with sensitive code, review the diff before committing or consider waiting for local LLM support.
 
 ---
 
 ## Conventional Commit Types
 
-CommitGen recognizes and uses these standard prefixes:
+CommitGen automatically categorizes your changes:
 
-| Type | Description | Example |
+| Type | When to Use | Example |
 |------|-------------|---------|
-| `FEAT` | New feature | `[FEAT]: add user authentication` |
-| `FIX` | Bug fix | `[FIX]: resolve null pointer exception` |
-| `DOCS` | Documentation | `[DOCS]: update API documentation` |
-| `STYLE` | Code style changes | `[STYLE]: format code with black` |
-| `REFACTOR` | Code refactoring | `[REFACTOR]: simplify auth logic` |
-| `PERF` | Performance improvement | `[PERF]: optimize database queries` |
-| `TEST` | Adding/updating tests | `[TEST]: add unit tests for auth` |
-| `CI` | CI/CD changes | `[CI]: update GitHub Actions workflow` |
-| `CHORE` | Maintenance tasks | `[CHORE]: update dependencies` |
+| `FEAT` | New features | `[FEAT]: add OAuth2 authentication` |
+| `FIX` | Bug fixes | `[FIX]: resolve memory leak in cache` |
+| `DOCS` | Documentation | `[DOCS]: add API endpoint examples` |
+| `STYLE` | Code formatting | `[STYLE]: apply black formatter` |
+| `REFACTOR` | Code restructuring | `[REFACTOR]: extract helper functions` |
+| `PERF` | Performance improvements | `[PERF]: optimize database queries` |
+| `TEST` | Adding tests | `[TEST]: add unit tests for auth` |
+| `CHORE` | Maintenance | `[CHORE]: update dependencies` |
+| `CI` | CI/CD changes | `[CI]: add GitHub Actions workflow` |
+
+---
+
+## Configuration
+
+CommitGen stores your API key securely in:
+
+- **Linux/macOS**: `~/.config/commitgen/config.env`
+- **Windows**: `%USERPROFILE%\.config\commitgen\config.env`
+
+The key is stored locally and never transmitted except to OpenAI's API.
+
+⚠️ **Never commit this file to Git**
 
 ---
 
@@ -364,34 +173,36 @@ CommitGen recognizes and uses these standard prefixes:
 ### Example 1: Simple Feature
 
 ```bash
-# Stage changes
+# You made changes to add a login endpoint
 git add src/auth.py
 
-# Generate commit
 commitgen commit
 ```
 
-**Output:**
+**Generated:**
 ```
-[FEAT]: add user authentication endpoint
+[FEAT]: add user login endpoint with JWT tokens
 ```
+
+---
 
 ### Example 2: Multiple Changes
 
 ```bash
-# Stage changes
+# You updated API, tests, and docs
 git add src/api.py tests/test_api.py README.md
 
-# Generate commit
 commitgen commit
 ```
 
-**Output:**
+**Generated:**
 ```
 [FEAT]: add user registration endpoint
-[TEST]: add tests for registration flow
+[TEST]: add integration tests for registration
 [DOCS]: update README with API examples
 ```
+
+---
 
 ### Example 3: Bug Fix with Context
 
@@ -399,22 +210,124 @@ commitgen commit
 commitgen commit
 ```
 
-**After generation:**
+When prompted, choose `(r)` to regenerate with context:
+
 ```
-(r) regenerate with context
-> "Fixes issue #123 where users couldn't login"
+Add context: Fixes issue #123 where special characters broke login
 ```
 
-**Result:**
+**Generated:**
 ```
-[FIX]: resolve login failure for users with special characters in username
+[FIX]: sanitize special characters in login handler
 
 Fixes #123
 ```
 
 ---
 
+### Example 4: Using Extended Editor
+
+Choose `(e)` to open your editor:
+
+```bash
+# CommitGen opens your $GIT_EDITOR with:
+
+# CommitGen – Extended Commit Message Editor
+#
+# Save the file before closing to apply changes.
+# Lines starting with '#' will be ignored.
+#
+
+[FEAT]: add user authentication
+```
+
+Edit, save (`Ctrl+S`), and close. CommitGen will use your edited message.
+
+---
+
+## Setting Your Preferred Editor
+
+CommitGen respects the same editor settings as Git.
+
+### VS Code (Recommended)
+
+**Windows PowerShell:**
+```powershell
+setx GIT_EDITOR "code --wait"
+```
+
+**Linux/macOS:**
+```bash
+echo 'export GIT_EDITOR="code --wait"' >> ~/.bashrc
+# or for zsh:
+echo 'export GIT_EDITOR="code --wait"' >> ~/.zshrc
+```
+
+### Other Editors
+
+**Vim:**
+```bash
+export GIT_EDITOR=vim
+```
+
+**Nano:**
+```bash
+export GIT_EDITOR=nano
+```
+
+**Sublime Text:**
+```bash
+export GIT_EDITOR="subl -w"
+```
+
+---
+
+## Workflow Integration
+
+### Typical Development Flow
+
+```bash
+# 1. Make your changes
+vim src/feature.py
+
+# 2. Stage what you want to commit
+git add src/feature.py
+
+# 3. Let CommitGen handle the message
+commitgen commit
+
+# 4. Push when ready
+git push
+```
+
+### Working with Unstaged Changes
+
+If you run `commitgen commit` without staging:
+
+```
+No staged changes detected.
+(a) stage all, (s) select files, (q) quit?
+```
+
+- `a` - Stages everything (`git add .`)
+- `s` - Lets you pick specific files
+- `q` - Exits so you can stage manually
+
+---
+
 ## Troubleshooting
+
+### "OpenAI API key not found"
+
+**Solution:**
+```bash
+commitgen config
+# Enter your API key
+```
+
+Your key is stored in `~/.config/commitgen/config.env`
+
+---
 
 ### "You are not inside a Git repository"
 
@@ -423,12 +336,7 @@ Fixes #123
 git init
 ```
 
-### "OpenAI API key not found"
-
-**Solution:** Configure your API key:
-```bash
-commitgen config
-```
+---
 
 ### "No staged changes detected"
 
@@ -439,39 +347,164 @@ git add <files>
 git add .
 ```
 
-### Editor opens but changes aren't saved
+---
 
-**Solution:** Make sure you:
-1. Save the file (`Ctrl+S` in VS Code, `:wq` in Vim)
-2. Close the editor after saving
-3. Check that `--wait` flag is set for VS Code users
+### Editor doesn't wait for save
 
-### CommitGen generates generic messages
+If using VS Code, ensure you have the `--wait` flag:
 
-**Solution:** Use the regenerate option `(r)` and provide specific context about what the changes accomplish.
+```bash
+# Check your setting
+echo $GIT_EDITOR
+
+# Should show: code --wait
+# If not, set it:
+export GIT_EDITOR="code --wait"
+```
 
 ---
 
-## Project Structure
+### Generic/unclear commit messages
 
+**Solution:** Use the regenerate option with context:
+
+1. Choose `(r)` when prompted
+2. Provide specific details about what changed
+3. CommitGen will regenerate with your context
+
+Example:
 ```
-commitgen/
-├── commitgen/
-│   ├── __init__.py
-│   ├── cli.py           # Main CLI interface with Typer
-│   ├── ai.py            # OpenAI API integration
-│   ├── git_utils.py     # Git operations
-│   └── config.py        # Configuration management
-├── pyproject.toml       # Project metadata and dependencies
-├── README.md
-└── LICENSE
+Add context: Optimized query performance by adding database indexes
 ```
+
+---
+
+## Advanced Usage
+
+### Customizing the Workflow
+
+**Skip the push prompt:**
+```bash
+# Always push after commit
+commitgen commit --push
+
+# Never get asked to push
+# (just press 'n' when prompted)
+```
+
+**Working with branches:**
+```bash
+# CommitGen works with any branch
+git checkout -b feature/new-feature
+# ... make changes ...
+commitgen commit
+```
+
+**Amending commits:**
+```bash
+# CommitGen doesn't amend, but you can after:
+git commit --amend
+```
+
+---
+
+## Comparison with Alternatives
+
+### vs Manual Writing
+
+| Manual | CommitGen |
+|--------|-----------|
+| ❌ Inconsistent format | ✅ Always follows Conventional Commits |
+| ❌ Vague messages | ✅ Specific, contextual descriptions |
+| ❌ Prone to typos | ✅ Properly formatted |
+| ❌ Time-consuming | ✅ Instant generation |
+
+### vs GitHub Copilot
+
+| Copilot | CommitGen |
+|---------|-----------|
+| Only suggests based on file names | Analyzes actual diff content |
+| Generic suggestions | Context-aware with GPT-5-nano |
+| No editing workflow | Interactive review and editing |
+| No multiple change handling | Handles FEAT + FIX + DOCS in one commit |
+| Fixed model | Model selection coming soon |
+
+---
+
+## Security & Privacy
+
+### What CommitGen Sends to OpenAI
+
+- ✅ Git diff (added/removed lines)
+- ✅ File paths
+- ❌ Your full source code
+- ❌ Git history
+- ❌ Credentials or secrets
+
+### API Key Storage
+
+- Stored locally in `~/.config/commitgen/`
+- Never transmitted except to OpenAI
+- Never logged or committed
+
+### Best Practices
+
+1. **Review diffs before committing** - Ensure no secrets are staged
+2. **Use `.gitignore`** - Keep sensitive files out of commits
+3. **Set OpenAI usage limits** - Control API costs in your OpenAI dashboard
+4. **Use environment variables for secrets** - Never hardcode credentials
+
+---
+
+## Limitations & Future Plans
+
+### Current Limitations
+
+- ⚠️ **Requires OpenAI API key** (paid service)
+- ⚠️ **Requires internet connection** to generate messages
+- ⚠️ **Fixed AI model** (GPT-5-nano) - no model selection yet
+- ⚠️ **No support for commit templates** yet
+- ⚠️ **English-only** commit messages (for now)
+
+### Planned Features
+
+- 🔄 **Local LLM support** - Use Ollama, LM Studio, or local models (offline commits!)
+- 🎛️ **Model selection** - Choose your preferred OpenAI model (GPT-4, GPT-3.5, etc.)
+- 🎨 **Custom templates** - Define your own commit format
+- 🌍 **Multi-language** - Commits in your preferred language
+- 🔗 **Git hooks integration** - Auto-suggest on `git commit`
+- 📊 **Commit history** - Learn from your commit patterns
+- 🎯 **Team presets** - Share commit style across teams
+
+---
+
+## Project Roadmap
+
+### Version 0.1.0 (Current) ✅
+- Basic commit generation with GPT-5-nano
+- Interactive workflow (accept/regenerate/edit)
+- OpenAI integration
+- Configuration management
+- Comprehensive test suite
+- CI/CD pipeline
+
+### Version 0.2.0 (Planned)
+- [ ] Local LLM support (Ollama, LM Studio)
+- [ ] Configurable AI model selection
+- [ ] Custom commit templates
+- [ ] Commit message history/learning
+
+### Version 0.3.0 (Future)
+- [ ] Multi-language commit messages
+- [ ] Git hooks integration
+- [ ] VS Code extension
+- [ ] Team presets and shared configurations
 
 ---
 
 ## Contributing
 
-We welcome contributions! Here's how to get started:
+Contributions are welcome! Here's how:
 
 1. **Fork the repository**
 2. **Create a feature branch**
@@ -479,106 +512,129 @@ We welcome contributions! Here's how to get started:
    git checkout -b feature/amazing-feature
    ```
 3. **Make your changes**
-4. **Test thoroughly**
-5. **Commit with CommitGen** (dogfooding!)
+4. **Write or update tests**
+5. **Commit using CommitGen!**
    ```bash
    commitgen commit
    ```
-6. **Push to your fork**
+6. **Push and open a PR**
    ```bash
    git push origin feature/amazing-feature
    ```
-7. **Open a Pull Request**
 
 ### Development Setup
 
 ```bash
-# Clone your fork
+# Clone the repo
 git clone https://github.com/<your-username>/commitgen.git
 cd commitgen
 
-# Install in editable mode with dev dependencies
+# Install in editable mode
 pip install -e .
 
-# Run the CLI
-commitgen --help
+# Run tests (when available)
+pytest
 ```
 
 ---
 
-## Roadmap
+## FAQ
 
-Coming soon:
+### Why does CommitGen need an API key?
 
-- [ ] Docker support for containerized usage
-- [ ] CI/CD pipeline with GitHub Actions
-- [ ] Automated testing suite
-- [ ] Support for custom commit message templates
-- [ ] Support for other AI providers (Anthropic, Gemini)
-- [ ] Commit history analysis and suggestions
-- [ ] Integration with Git hooks
-- [ ] VS Code extension
+Currently, CommitGen uses OpenAI's GPT-5-nano model to understand your code changes. This model is hosted by OpenAI and requires authentication.
+
+**Future versions will support:**
+- Free local LLMs (Ollama, LM Studio)
+- Model selection (GPT-4, GPT-3.5-turbo, etc.)
 
 ---
 
-## License
+### How much does it cost?
 
-MIT License © [Christopher Kola]
+With GPT-5-nano, approximately **$0.001 to $0.01 per commit** depending on diff size. For most developers:
+- 100 commits/month = ~$0.10 - $1.00
+- Set usage limits in your OpenAI dashboard to control costs
 
-See [LICENSE](LICENSE) for details.
+GPT-5-nano is optimized for speed and cost-effectiveness.
+
+---
+
+### Can I use other AI providers?
+
+Not yet, but it's planned! Future versions will support:
+- Anthropic Claude
+- Google Gemini
+- Local models (Ollama, LM Studio)
+- Azure OpenAI
+
+---
+
+### Is my code sent to OpenAI?
+
+Only the **git diff** is sent - showing what changed in your staged files. Your full codebase, git history, and credentials are never transmitted.
+
+---
+
+### What if I don't have internet?
+
+CommitGen requires an internet connection to contact OpenAI's API. Local LLM support (which works offline) is planned for v0.2.0.
+
+---
+
+### Can I customize the commit format?
+
+Not yet, but custom templates are planned for v0.3.0. Currently, CommitGen follows standard Conventional Commits format.
+
+---
+
+### Does CommitGen work with GitLab/Bitbucket?
+
+Yes! CommitGen works with any Git repository, regardless of where it's hosted (GitHub, GitLab, Bitbucket, self-hosted, etc.).
+
+---
+
+## Support
+
+### Found a bug?
+Open an issue: [GitHub Issues](https://github.com/<your-username>/commitgen/issues)
+
+### Have a question?
+Start a discussion: [GitHub Discussions](https://github.com/<your-username>/commitgen/discussions)
+
+### Want to contribute?
+See our [Contributing](#contributing) section above!
 
 ---
 
 ## Acknowledgments
 
 Built with:
-- [OpenAI API](https://openai.com/) for AI-powered message generation
-- [Typer](https://typer.tiangolo.com/) for the beautiful CLI framework
-- [Rich](https://rich.readthedocs.io/) for terminal formatting
-- [Conventional Commits](https://www.conventionalcommits.org/) standard
+- [OpenAI API](https://openai.com/) - AI-powered analysis
+- [Typer](https://typer.tiangolo.com/) - CLI framework
+- [Rich](https://rich.readthedocs.io/) - Terminal formatting
+- [Conventional Commits](https://www.conventionalcommits.org/) - Commit standard
 
 ---
 
-## Support
+## License
 
-If you encounter issues or have suggestions:
-- 🐛 [Open an issue](https://github.com/<your-username>/commitgen/issues)
-- 💬 [Start a discussion](https://github.com/<your-username>/commitgen/discussions)
-- 🔧 Contribute improvements via Pull Requests
+MIT License © [Your Name]
 
----
-
-## FAQ
-
-### Why use CommitGen instead of GitHub Copilot?
-
-CommitGen is purpose-built for commit messages and:
-- Analyzes actual diff content, not just file names
-- Follows Conventional Commits strictly
-- Handles multiple change types in one commit
-- Gives you full editing control before committing
-
-### Does CommitGen work offline?
-
-No, CommitGen requires an internet connection to communicate with OpenAI's API.
-
-### How much does it cost?
-
-CommitGen itself is free and open-source. You only pay for OpenAI API usage, which is typically:
-- ~$0.001-0.01 per commit message (very cheap!)
-- You can set usage limits in your OpenAI account
-
-### Can I use a different AI provider?
-
-Not yet, but it's on the roadmap! We plan to support Anthropic Claude, Google Gemini, and other providers.
-
-### Is my code sent to OpenAI?
-
-Only the git diff is sent to generate the commit message. Your full codebase is never transmitted.
+See [LICENSE](LICENSE) for full details.
 
 ---
 
-**⭐ If you find CommitGen useful, please star the repository!**
+## Links
+
+- **PyPI**: [commitgen-cli](https://pypi.org/project/commitgen-cli/)
+- **GitHub**: [github.com/<your-username>/commitgen](https://github.com/<your-username>/commitgen)
+- **Documentation**: [Coming soon]
+- **Changelog**: [CHANGELOG.md](CHANGELOG.md)
+
+---
+
+**⭐ If CommitGen helps you write better commits, please star the repository!**
 
 ---
 
