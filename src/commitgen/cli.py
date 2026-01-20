@@ -193,7 +193,7 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
 @app.command()
 def version():
     """Show CommitGen version."""
-    console.print(Panel("CommitGen version: 0.1.2", title="Version", border_style="cyan"))
+    console.print(Panel("CommitGen version: 0.1.3", title="Version", border_style="cyan"))
 
 
 @app.command()
