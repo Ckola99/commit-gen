@@ -3,8 +3,9 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
+license = { text = "MIT" }
 name = "commitgen-tool"
-version = "0.1.0"
+version = "0.1.1"
 description = "AI-powered Conventional Commit generator"
 requires-python = ">=3.10"
 dependencies = [

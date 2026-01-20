@@ -97,7 +97,7 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
         # --- Suggested Commit Message ---
         console.print(Panel(message, title="💡 Suggested Commit Message", border_style="cyan"))
 
-        choice = typer.prompt("(a)ccept, (r)egenerate with context, (i)nline edit, (e)xtended inline edit in custom editor, or (q)uit?")
+        choice = typer.prompt("(a) accept, (r) regenerate with context, (i) inline edit, (e) extended inline edit in custom editor, or (q)uit?")
 
         if choice.lower() == 'a':
             git_utils.commit_changes(message)
@@ -110,7 +110,7 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
             if not extra_context:
                 continue
 
-            message = ai.refine_commit_message(diff_text, message, extra_context)
+            message = ai.refine_commit_message(message, extra_context)
 
         elif choice.lower() == 'i':
             edited = typer.prompt(
@@ -193,7 +193,7 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
 @app.command()
 def version():
     """Show CommitGen version."""
-    console.print(Panel("CommitGen version: 0.1.0", title="Version", border_style="cyan"))
+    console.print(Panel("CommitGen version: 0.1.1", title="Version", border_style="cyan"))
 
 
 @app.command()
