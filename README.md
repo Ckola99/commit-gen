@@ -4,6 +4,16 @@
 
 Stop writing bad commit messages. CommitGen uses AI to analyze your staged changes and generates clean, structured commits that follow the [Conventional Commits](https://www.conventionalcommits.org/) standard.
 
+![PyPI Version](https://img.shields.io/pypi/v/commitgen-tool)
+![Python Versions](https://img.shields.io/pypi/pyversions/commitgen-tool)
+![License](https://img.shields.io/pypi/l/commitgen-tool)
+
+## Features
+
+- Generate Conventional Commit messages from staged changes
+- Interactive CLI with inline or editor-based editing
+- Support for Git workflows of any size
+
 ```bash
 # Before CommitGen
 git commit -m "fix stuff"
