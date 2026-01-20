@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "commitgen-tool"
-version = "0.1.3"
+version = "0.1.5"
 description = "AI-powered Conventional Commit message generator for Git using OpenAI"
 license = { text = "MIT" }
 readme = { file = "README.md", content-type = "text/markdown" }
