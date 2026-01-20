@@ -648,4 +648,4 @@ See [LICENSE](LICENSE) for full details.
 
 ---
 
-**Made with ❤️ by developers who care about commit quality**
+**Made with ❤️ by a developer who cares about commit quality**
