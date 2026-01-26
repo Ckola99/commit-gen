@@ -11,7 +11,8 @@ console = Console()
 
 
 @app.command()
-def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commit after committing")):
+def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commit after committing"),
+           auto: bool = typer.Option(False, "--auto", "-a", help="Automatically commit with generated message and push")):
     """
     Generate a Conventional Commit message from staged changes.
     """
@@ -23,6 +24,29 @@ def commit(push: bool = typer.Option(False, "--push", "-p", help="Push the commi
     if not git_utils.verify_repo():
         console.print(Panel("[bold red]You are not inside a Git repository[/bold red]", title="Error", border_style="red"))
         raise typer.Exit(code=1)
+
+    if auto:
+        # --- Ensure staged changes ---
+        if not git_utils.has_staged_changes():
+            git_utils.stage_all_changes()
+
+        diff_text = git_utils.get_staged_diff()
+        if not diff_text.strip():
+            console.print("[red]No changes detected[/red]")
+            raise typer.Exit(code=1)
+
+        message = ai.generate_commit_message(diff_text, current_context)
+        if not message.strip():
+            message = ai._fallback_commit_message(diff_text, current_context)
+
+        git_utils.commit_changes(message)
+        console.print(Panel("[green]✅ Auto commit successful![/green]", title="Success", border_style="green"))
+
+        if push or True:
+            git_utils.push_changes()
+            console.print(Panel("[green]✅ Auto push complete![/green]", title="Success", border_style="green"))
+
+        raise typer.Exit()
 
 
     if not git_utils.has_staged_changes():

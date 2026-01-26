@@ -61,3 +61,39 @@ class TestCLI(unittest.TestCase):
     def test_config_command(self, *_):
         result = runner.invoke(app, ["config"])
         self.assertEqual(result.exit_code, 0)
+
+    @patch("commitgen.cli.git_utils.verify_repo", return_value=True)
+    @patch("commitgen.cli.git_utils.has_staged_changes", return_value=True)
+    @patch("commitgen.cli.git_utils.get_staged_diff", return_value="diff --git a b")
+    @patch("commitgen.cli.ai.generate_commit_message", return_value="[FEAT]: auto commit")
+    @patch("commitgen.cli.ai._fallback_commit_message", return_value="[FEAT]: fallback commit")
+    @patch("commitgen.cli.git_utils.commit_changes")
+    @patch("commitgen.cli.git_utils.push_changes")
+    def test_commit_auto_flag(self, mock_push, mock_commit, mock_fallback, mock_generate, mock_diff, mock_staged, mock_verify):
+        """Test that --auto flag commits and pushes automatically."""
+        result = runner.invoke(app, ["commit", "--auto"])
+
+        # Should exit after auto commit
+        self.assertEqual(result.exit_code, 0)
+
+        # Ensure commit_changes is called once with generated message
+        mock_commit.assert_called_once_with("[FEAT]: auto commit")
+
+        # Ensure push_changes is called once
+        mock_push.assert_called_once()
+
+    @patch("commitgen.cli.git_utils.verify_repo", return_value=True)
+    @patch("commitgen.cli.git_utils.has_staged_changes", return_value=False)
+    @patch("commitgen.cli.git_utils.stage_all_changes")
+    @patch("commitgen.cli.git_utils.get_staged_diff", return_value="diff --git a b")
+    @patch("commitgen.cli.ai.generate_commit_message", return_value="[FEAT]: auto staged commit")
+    @patch("commitgen.cli.git_utils.commit_changes")
+    @patch("commitgen.cli.git_utils.push_changes")
+    def test_commit_auto_flag_stages_changes(self, mock_push, mock_commit, mock_generate, mock_diff, mock_stage_all, mock_staged, mock_verify):
+        """Test that --auto stages all changes if nothing is staged."""
+        result = runner.invoke(app, ["commit", "--auto"])
+
+        self.assertEqual(result.exit_code, 0)
+        mock_stage_all.assert_called_once()
+        mock_commit.assert_called_once_with("[FEAT]: auto staged commit")
+        mock_push.assert_called_once()

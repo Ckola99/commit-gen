@@ -1,8 +1,0 @@
-Metadata-Version: 2.4
-Name: commitgen
-Version: 0.1.0
-Summary: AI-powered Conventional Commit generator
-Requires-Python: >=3.10
-Requires-Dist: typer
-Requires-Dist: python-dotenv
-Requires-Dist: openai
